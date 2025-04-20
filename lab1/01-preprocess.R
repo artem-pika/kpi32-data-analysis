@@ -5,7 +5,7 @@
 library(tidyverse)
 library(here)
 
-data <- read_csv(here::here("data/data.csv"))
+data <- read_csv(here::here("data/data0.csv"))
 
 # Process main variables - blood pressure measurements
 # Aggregate 4 blood pressure measurements to get a single variable

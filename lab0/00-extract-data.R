@@ -44,6 +44,7 @@ extract_data_by_year <- function(survey_year_symbol) {
       seqn = SEQN,
       subcutaneous_fat_g = DXXSATM,
       visceral_fat_g = DXXVFATM,
+      abdominal_fat_g = DXXTATM,
       android_g = DXXANTOM,
       android_fat_g = DXXANFM,
       android_non_fat_g = DXXANLM,

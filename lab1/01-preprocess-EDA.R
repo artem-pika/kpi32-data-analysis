@@ -32,7 +32,7 @@ categorical_summary <- function(data, col_name) {
     )
 }
 
-data <- read_csv(here::here("data/data.csv"))
+data <- read_csv(here::here("data/data0.csv"))
 names(data)
 dim(data)
 count_na(data) |>
