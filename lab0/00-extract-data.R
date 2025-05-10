@@ -32,7 +32,19 @@ extract_data_by_year <- function(survey_year_symbol) {
     mutate(
       seqn = SEQN,
       weight_kg = BMXWT,
+      height_cm = BMXHT,
       waist_cm = BMXWAIST,
+      .keep = "none"
+    )
+  
+  file <- append_survey_year("DXX")
+  dxx <- tibble(nhanes(file))
+  cat(file, "done\n")
+  dxx <- dxx |>
+    mutate(
+      seqn = SEQN,
+      lean_mass_g = DXDSTLI,
+      fat_mass_g = DXDSTFAT,
       .keep = "none"
     )
   
@@ -42,13 +54,10 @@ extract_data_by_year <- function(survey_year_symbol) {
   dxxag <- dxxag |>
     mutate(
       seqn = SEQN,
-      subcutaneous_fat_g = DXXSATM,
       visceral_fat_g = DXXVFATM,
-      abdominal_fat_g = DXXTATM,
-      android_g = DXXANTOM,
+      subcutaneous_fat_g = DXXSATM,
       android_fat_g = DXXANFM,
       android_non_fat_g = DXXANLM,
-      gynoid_g = DXXGYTOM,
       gynoid_fat_g = DXXGYFM,
       gynoid_non_fat_g = DXXGYLM,
       .keep = "none"
@@ -60,87 +69,18 @@ extract_data_by_year <- function(survey_year_symbol) {
   demographics <- demographics |>
     mutate(
       seqn = SEQN,
-      survey_year = SDDSRVYR,
       age = RIDAGEYR,
       gender = RIAGENDR,
       race = RIDRETH3,
-      education = if_else(DMDEDUC2 %in% c("Don't Know", "Refused"), NA, DMDEDUC2),
       .keep = "none"
     )
-  
-  file <- append_survey_year("INQ")
-  income <- tibble(nhanes(file))
-  cat(file, "done\n")
-  income <- income |>
-    mutate(
-      seqn = SEQN,
-      poverty_index = INDFMMPI,
-      .keep = "none"
-    )
-  
-  file <- append_survey_year("PAQ")
-  physical_activity <- tibble(nhanes(file))
-  cat(file, "done\n")
-  physical_activity <- physical_activity |>
-    mutate(
-      seqn = SEQN,
-      vigorous_phys_activity = if_else(PAQ650 %in% c("Don't know", "Refused"), NA, PAQ650),
-      vigorous_phys_activity_days = if_else(PAQ655 %in% c(77, 99), NA, PAQ655),
-      moderate_phys_activity = if_else(PAQ665 %in% c("Don't know", "Refused"), NA, PAQ665),
-      moderate_phys_activity_days = if_else(PAQ670 %in% c(77, 99), NA, PAQ670),
-      .keep = "none"
-    )
-  
-  file <- append_survey_year("SLQ")
-  sleep <- tibble(nhanes(file))
-  cat(file, "done\n")
-  if ("SLD012" %in% names(sleep)) {
-    sleep <- sleep |>
-      mutate(
-        seqn = SEQN,
-        sleep = SLD012,
-        .keep = "none"
-      )
-  } else {
-    sleep <- sleep |>
-      mutate(
-        seqn = SEQN,
-        sleep = if_else(SLD010H %in% c(77, 99), NA, SLD010H),
-        .keep = "none"
-      )
-  }
 
-  file <- append_survey_year("SMQ")
-  smoking <- tibble(nhanes(file))
-  cat(file, "done\n")
-  smoking <- smoking |>
-    mutate(
-      seqn = SEQN,
-      smoking_now = if_else(SMQ040 %in% c("Refused", "Don't know"), NA, SMQ040),
-      smoked_100_cigs = if_else(SMQ020 %in% c("Refused", "Don't know"), NA, SMQ020),
-      .keep = "none"
-    )
-  
-  file <- append_survey_year("DBQ")
-  diet_quality <- tibble(nhanes(file))
-  cat(file, "done\n")
-  diet_quality <- diet_quality |>
-    mutate(
-      seqn = SEQN,
-      diet_quality = if_else(DBQ700 %in% c("Refused", "Don't know"), NA, DBQ700),
-      .keep = "none"
-    )
-  
   tables <- list(
     blood_pressure, 
     body_measures,
+    dxx,
     dxxag,
-    demographics,
-    income,
-    physical_activity,
-    sleep,
-    smoking,
-    diet_quality
+    demographics
   )
   final <- reduce(tables, .f = left_join)
   return(final)
@@ -152,4 +92,4 @@ data_H <- extract_data_by_year("H")
 data_I <- extract_data_by_year("I")
 data_J <- extract_data_by_year("J")
 data <- bind_rows(data_G, data_H, data_I, data_J)
-write_csv(data, "data/data.csv")
+write_csv(data, "data/data_lab3.csv")
